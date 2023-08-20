@@ -2,8 +2,12 @@
 
 # dependencies
 ocrfront/node_modules
+ocrfront/.next/cache
 .pnp
 .pnp.js
+backend/__pycache__
+backend/venv
+.env
 
 # testing
 /coverage
