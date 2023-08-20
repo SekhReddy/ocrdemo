@@ -11,7 +11,7 @@ export default function ProcessImage() {
   const router = useRouter();
 
   function handleChange(e: any) {
-    setImageText(e.target.value);
+    setImageText(e);
   }
 
   const handleSubmit = async (req: any) => {
@@ -28,12 +28,13 @@ export default function ProcessImage() {
 
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/`, {
-        method: "POST:",
+        method: "POST",
         body: parsedFormData,
         headers: { "Content-Type": "application/json" },
       });
       const result = await response.json();
       console.log(result);
+      handleChange(result["Image Text"]);
     } catch (error) {
       console.log(error);
     }

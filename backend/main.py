@@ -1,4 +1,6 @@
-from fastapi import FastAPI, UploadFile
+from shutil import copyfileobj
+from fastapi import FastAPI, Request, Body
+from requests import get as download
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from fastapi.param_functions import File
@@ -24,9 +26,14 @@ app = FastAPI(middleware=middleware)
 
 
 @app.post("/")
-async def return_image_text(file: UploadFile = File(...)):
-    print("return_image_text method\n")
-    file_bytes = np.fromfile(file.file, np.uint8)
+async def return_image_text(request: dict = Body(...)):
+    response = download(request["url"], stream=True)
+    result = response.raw
+    outputFile = open(request["name"], "wb")
+    copyfileobj(response.raw, outputFile)
+    outputFile.flush()
+    outputFile.close()
+    file_bytes = np.fromfile(request["name"], np.uint8)
     file_input = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
     text = pytesseract.image_to_string(file_input)
     return {"Image Text": text}
