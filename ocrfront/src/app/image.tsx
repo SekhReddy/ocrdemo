@@ -1,43 +1,37 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "@uploadthing/react/styles.css";
+import { useRouter } from "next/navigation";
 import { UploadButton } from "./uploadthingutil";
 
 export default function ProcessImage() {
   const [imageText, setImageText] = useState("");
-  const [imageFile, setImageFile] = useState("");
-
-  useEffect(() => {
-    async function fetchImageText() {
-      const result = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/`);
-      const json = await result.json();
-      console.log(json);
-      setImageText(json);
-    }
-  }, []);
+  const formDataBody = require("form-data-body");
+  const router = useRouter();
 
   function handleChange(e: any) {
     setImageText(e.target.value);
   }
 
-  async function handleSubmit(image: any) {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}`, {
-      method: "POST",
-      body: image,
-    })
-      .then(async (r) => {
-        if (r.ok) {
-          const json = await r.json();
-          const jsonText = JSON.parse(json);
-          setImageText(jsonText);
-          alert("Image uploaded successfully");
-        }
-      })
-      .catch((e) => {
-        alert(`Upload Error! ${e.message}`);
+  const handleSubmit = async (e: File) => {
+    const formData = new FormData();
+    const blob = new Blob([e], { type: "image/png" });
+    console.log(blob);
+    formData.append("file", blob);
+    console.log(formData);
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/`, {
+        method: "POST",
+        body: formData,
+        headers: { "Content-Type": "application/json" },
       });
-  }
+      const result = await response.json();
+      console.log(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div>
@@ -46,11 +40,8 @@ export default function ProcessImage() {
           <div className="mx-auto p-3 m-5">
             <UploadButton
               endpoint="imageUploader"
-              onClientUploadComplete={(result: any) => {
-                const uploadedImage = result;
-                let formData = new FormData();
-                formData.set("file", uploadedImage);
-                handleSubmit(formData);
+              onClientUploadComplete={(uploadedImage: any) => {
+                handleSubmit(uploadedImage);
                 alert("File uploaded successfully");
               }}
               onUploadError={(error: Error) => {
