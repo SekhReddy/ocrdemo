@@ -3,6 +3,8 @@
 # dependencies
 ocrfront/node_modules
 ocrfront/.next/cache
+ocrfront/.env.development
+ocrfront/.env.local
 .pnp
 .pnp.js
 backend/__pycache__

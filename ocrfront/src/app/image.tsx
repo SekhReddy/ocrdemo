@@ -14,16 +14,22 @@ export default function ProcessImage() {
     setImageText(e.target.value);
   }
 
-  const handleSubmit = async (e: File) => {
-    const formData = new FormData();
-    const blob = new Blob([e], { type: "image/png" });
-    console.log(blob);
-    formData.append("file", blob);
+  const handleSubmit = async (req: any) => {
+    console.log(req);
+    console.log(req[0]);
+    const formData = {
+      name: String(req[0].name),
+      url: String(req[0].fileUrl),
+      size: String(req[0].size),
+    };
+    const parsedFormData = JSON.stringify(formData, null, 4);
     console.log(formData);
+    console.log(parsedFormData);
+
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/`, {
-        method: "POST",
-        body: formData,
+        method: "POST:",
+        body: parsedFormData,
         headers: { "Content-Type": "application/json" },
       });
       const result = await response.json();
